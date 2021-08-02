@@ -1,0 +1,129 @@
+title = "bifrost.dev"
+
+[owner]
+name = "covine"
+created = 2020-10-10T10:48:00+08:00
+updated = 2020-10-10T10:48:00+08:00
+
+[mode]
+debug = true
+
+[broker]
+reset = 30
+
+[serve]
+
+  [serve.grpc]
+  host = "0.0.0.0"
+  port = 8081
+
+  [serve.http]
+  host = "0.0.0.0"
+  port = 8080
+
+  [serve.tcp]
+  enable = true
+  host = "0.0.0.0"
+  port = 1883
+
+  [serve.tls]
+  enable = true
+  host = "0.0.0.0"
+  port = 8883
+  verify = false
+  caPem = "deploy/ca/ca.pem"
+  certPem = "deploy/server/cert.pem"
+  keyPem = "deploy/server/key.pem"
+
+  [serve.ws]
+  enable = true
+  host = "0.0.0.0"
+  port = 6437
+  path = "/ws"
+
+  [serve.wss]
+  enable = true
+  host = "0.0.0.0"
+  port = 6436
+  path = "/wss"
+  verify = false
+  caPem = "deploy/ca/ca.pem"
+  certPem = "deploy/server/cert.pem"
+  keyPem = "deploy/server/key.pem"
+
+[client]
+# s
+retry = 30
+# s
+reset = 30
+# s
+waitConnect = 30
+  [client.connection]
+  max = 1000000
+
+[peer]
+reset = 30
+
+[cluster]
+enable = true
+external = "180.164.60.210"
+host = "0.0.0.0"
+tcpPort = 1993
+leaseKeyPrefix = "/cluster/node/lease"
+lease = 21
+renewLeaseInterval = 7
+syncBrokersInterval = 21
+peerConnMaxInterval = 30
+  [cluster.proxy]
+  poolSize = 100
+  retry = 30
+  sendTimeout = 7
+  ackChan = 1024
+  sendSubUnsubChan = 512
+  inflight = 1024
+  subUnsubQueue = 1024
+  [cluster.etcd]
+  endpoints = ["10.89.1.152:22379", "10.89.1.152:32379", "10.89.1.152:42379"]
+  timeout = 3
+
+[session]
+  [session.client] # session for clients
+  zQueue = 128
+  oTQueue = 128
+  inflight = 64
+  [session.peer] # session for peers
+  zQueue = 1024
+  oTQueue = 1024
+  inflight = 512
+
+[receiver]
+[receiver.client]
+recvChan = 300
+[receiver.peer]
+recvChan = 700
+
+[sender]
+  # retry interval for QoS 1, 2 <publish>
+  retry = 30 # (second)
+  [sender.client]
+  ackChan = 300
+  pubChan = 300
+  [sender.peer]
+  ackChan = 700
+  pubChan = 700
+
+[bridge]
+name = ""
+  [bridge.kafka]
+  endpoints = ["10.89.1.152:9092"]
+  onConnect = "onConnect"
+  # onPublish = "onPublish"
+  onSubscribe = "onSubscribe"
+  onDisconnect = "onDisconnect"
+  onUnsubscribe = "onUnsubscribe"
+    [[bridge.kafka.deliverMap]]
+    key = "#"
+    value = "publish"
+    [[bridge.kafka.deliverMap]]
+    key = "/upload/+/#"
+    value = "upload"

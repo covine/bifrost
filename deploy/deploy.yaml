@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-broker
+spec:
+  selector:
+    matchLabels:
+      app: mqtt-broker
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mqtt-broker
+    spec:
+      containers:
+        - name: mqtt-broker
+          image: uhub.service.ucloud.cn/uiot_core_hub/bifrost:v0.1.0
+          ports:
+            - containerPort: 1883
+            - containerPort: 8080
+          volumeMounts:
+            - name: mqtt-broker
+              mountPath: /conf
+              subPath: bifrost.1.json
+            - name: mqtt-broker
+              mountPath: /plugins/kafka/kafka.json
+              subPath: kafka.json
+            - name: mqtt-broker
+              mountPath: /plugins/authttp/http.json
+              subPath: kafka.json     
+      volumes:
+        - name: mqtt-broker
+          configMap:
+            name: mqtt-broker
+            items:
+              - key: bifrost.1.json
+                path: bifrost.1.json
+            items:
+              - key: http.json
+                path: http.json
+            items:
+              - key: kafka.json
+                path: kafka.json
+
